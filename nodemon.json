@@ -1,0 +1,11 @@
+{
+  "exec": "node app/index.mjs",
+  "watch": [
+    "app/*",
+    "lib/*"
+  ],
+  "ext": "js, json, mjs",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}
