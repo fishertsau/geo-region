@@ -16,10 +16,11 @@ const getEnName = getNamePair('en_name');
 const getZhTwName = getNamePair('zh_tw_name');
 const getCnName = getNamePair('zh_cn_name');
 
-const getEnZhTwPair = (r) => [r.region, r.zh_tw_name];
-const getEnZhCnPair = (r) => [r.region, r.zh_cn_name];
+const getEnZhTwPair = (r) => [r.en_name, r.zh_tw_name];
+const getEnZhCnPair = (r) => [r.en_name, r.zh_cn_name];
 
 const byRegion = (a, b) => (a.region > b.region) ? 1 : -1;
+const byEnName = (a, b) => (a.en_name > b.en_name) ? 1 : -1;
 const byId = (a, b) => (a.id > b.id) ? 1 : -1;
 const hasEn = (region) => R.prop('en_name')(region) !== '';
 const hasZhTw = (region) => R.prop('zh_tw_name')(region) !== '';
@@ -30,6 +31,23 @@ const jsLangs = ['zh-tw', 'zh-cn'];
 const prependExport = (content) => ('module.exports=' + content);
 
 const registerRoutes = (app) => {
+  router.get('/remoteDb/sqlcmd', async (ctx) => {
+    const { sqlcmd } = ctx.request.body;
+
+    /** 下sql語法 **/
+    await doSqlCmd(app.prodSlaveDbConn)(sqlcmd)
+      .then(async (result) => {
+        console.log(result);
+        return true;
+      })
+      .then(() =>
+        ctx.body = {
+          result: 'ok',
+          msg: 'sqlcmd executed successfully!',
+        },
+      );
+  });
+
   router.get('/migrate/:tableName', async (ctx) => {
     const { tableName } = ctx.params;
 
@@ -42,6 +60,7 @@ const registerRoutes = (app) => {
     /** 下sql語法 **/
     await doSqlCmd(app.prodSlaveDbConn)(sqlCmd)
       .then(async (result) => {
+        console.log(result);
         for(let i = 0; i < result.length; i++) {
           await app.localDb(tableName).insert({ ...result[i] });
         }
@@ -57,7 +76,7 @@ const registerRoutes = (app) => {
       );
   });
 
-  router.post('/generate/json/geoip_region', async (ctx) => {
+  router.post('/generate/geoip_region/json', async (ctx) => {
     // get data from local database
     const regions = await app.localDb('geoip_region').select();
 
@@ -91,7 +110,7 @@ const registerRoutes = (app) => {
     };
   });
 
-  router.post('/generate/js/geoip_region', async (ctx) => {
+  router.post('/generate/geoip_region/js', async (ctx) => {
     // get data from local database
     const regions = await app.localDb('geoip_region').select();
 
@@ -104,7 +123,7 @@ const registerRoutes = (app) => {
     }
 
     // generate js file
-    const cleanData = pipe(R.filter(hasEn), R.filter(hasZhTw), R.sort(byRegion))(regions);
+    const cleanData = pipe(R.filter(hasEn), R.filter(hasZhTw), R.sort(byEnName))(regions);
 
     const customTransform = (tempFilename, destFilename) => () => {
       const fileContent = fs.readFileSync(tempFilename, 'utf-8');

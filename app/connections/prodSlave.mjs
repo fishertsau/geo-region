@@ -1,6 +1,9 @@
 import mysql from 'mysql2';
+import config from 'config';
+import R from 'ramda';
 
-// todo: move config to a central place
+const dbConfig = R.path(['database', 'prodSlave'])(config);
+
 export const setupDbConn = (app) => (sshClient) => {
   // 在 ssh tunnel中,建立一個 mysql.db連線
   // mysql server看到的client-ip是ssh server的ip
@@ -9,23 +12,18 @@ export const setupDbConn = (app) => (sshClient) => {
     // src
     '127.0.0.1', // host
     3306,  // port
+
     // dst
-    'prod-slave', // host
+    dbConfig.host, // host
     3306, //port
 
-    // callback
+    // 建立DB連線
     async (err, stream) => {
-      // 建立DB連線
       // todo: 寫event logs
       app.prodSlaveDbConn = await mysql.createConnection({
-        host: 'prod-slave',
-        port: 3306,
-        database: 'pineapple',
-        user: 'prod_rd5',
-        password: 'lazYbIrd@min17raft',
+        ...dbConfig,
         stream,
       });
     },
   );
 };
-

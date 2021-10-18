@@ -6,6 +6,9 @@ export const doSqlCmd = (givenDbConn) => async (sqlCmd) => {
   let returned = false;
 
   givenDbConn.query(sqlCmd, function (err, results) {
+    if (err) {
+      console.log('error in doSqlCmd:', err);
+    }
     result = results;
     returned = true;
   });
