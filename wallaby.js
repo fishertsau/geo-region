@@ -6,9 +6,11 @@ module.exports = function (wallaby) {
       'package.json',
       'app/**/*.js',
       { pattern: 'tests/**/*.test.js', ignore: true },
+      { pattern: 'tests/**/*.test.mjs', ignore: true },
     ],
     tests: [
       'tests/**/*.test.js',
+      'tests/**/*.test.mjs',
     ],
     env: {
       type: 'node',

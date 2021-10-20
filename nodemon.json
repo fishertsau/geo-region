@@ -1,5 +1,5 @@
 {
-  "exec": "node app/index.mjs",
+  "exec": "babel-node app/index.mjs",
   "watch": [
     "app/*",
     "lib/*"

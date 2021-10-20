@@ -9,7 +9,7 @@ const router = new Router({ prefix: '/api' });
 
 const getNamePair = (langName) => (r) => {
   const value = !!R.prop(langName)(r) ? R.prop(langName)(r) : R.prop('en_name')(r);
-  return [`COMMON_CITY_ID_${r.id}`, value];
+  return [`COMMON_REGION_ID_${r.id}`, value];
 };
 
 const getEnName = getNamePair('en_name');

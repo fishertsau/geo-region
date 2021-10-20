@@ -1,6 +1,5 @@
 import koa from 'koa';
 import db_check from './lib/db_check.mjs';
-import { doSqlCmd } from '../db/utils.mjs';
 import local_db from '../db/local_db.mjs';
 import ssh_check from './lib/ssh_check.mjs';
 import anonymous_db from '../db/anonymous_db.mjs';
@@ -32,8 +31,8 @@ anonymous_db(app);
 
 /**
  * todo:
- * - [ ] api => 檢查ssh連線
- * - [ ] api => 檢查mysql連線
+ * - [x] api => 檢查ssh連線
+ * - [x] api => 檢查mysql連線
  * - [ ] ssh斷線時通知 (用eventListener)
  * - [ ] sql斷線時通知 (用 eventListener)
  * - [ ] 動態新增ssh連線
